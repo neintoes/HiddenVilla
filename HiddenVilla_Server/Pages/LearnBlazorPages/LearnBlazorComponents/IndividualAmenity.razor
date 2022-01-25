@@ -1,0 +1,26 @@
+﻿<div @onclick="(args)=> InvokeAmenityChangeCallback(args, amenity.Name)" class="bg-light border p-2 col-5">
+    <h3>Amenity - @amenity.Id</h3>
+    @amenity.Name<br />
+    @amenity.Value<br />
+    These are the render fragments from the amenity -<br />
+    @firstFragment<br />
+    @secondFragment<br />
+
+</div>
+
+@code{
+    [Parameter]
+    public BlazorAmenities amenity { get; set; }
+    [Parameter]
+    public EventCallback<string> AmenityChangeCallback { get; set; }
+    [Parameter]
+    public RenderFragment firstFragment { get; set; }
+    [Parameter]
+    public RenderFragment secondFragment { get; set; }
+
+    protected async Task InvokeAmenityChangeCallback(EventArgs e, string inputAmenity)
+    {
+        await AmenityChangeCallback.InvokeAsync(inputAmenity);
+    }
+
+}

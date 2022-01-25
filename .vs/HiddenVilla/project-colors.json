@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "71004fcf-f5b9-4e10-ae48-3dec94603037": {
+      "ProjectGuid": "71004fcf-f5b9-4e10-ae48-3dec94603037",
+      "DisplayName": "HiddenVilla_Server",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    },
+    "b4f441d1-0c4c-403a-81f0-189c8165bac6": {
+      "ProjectGuid": "b4f441d1-0c4c-403a-81f0-189c8165bac6",
+      "DisplayName": "DataAccess",
+      "ColorIndex": 1
+    },
+    "426901a9-ac12-46ff-b3ee-70328890ff27": {
+      "ProjectGuid": "426901a9-ac12-46ff-b3ee-70328890ff27",
+      "DisplayName": "ClassLibrary1",
+      "ColorIndex": 2
+    },
+    "f666869a-d1ae-4d04-b6d0-450c02f55271": {
+      "ProjectGuid": "f666869a-d1ae-4d04-b6d0-450c02f55271",
+      "DisplayName": "Models",
+      "ColorIndex": 3
+    },
+    "3eed698a-8561-42b8-9cdf-444e991d90e7": {
+      "ProjectGuid": "3eed698a-8561-42b8-9cdf-444e991d90e7",
+      "DisplayName": "Business",
+      "ColorIndex": 4
+    }
+  },
+  "NextColorIndex": 5
+}

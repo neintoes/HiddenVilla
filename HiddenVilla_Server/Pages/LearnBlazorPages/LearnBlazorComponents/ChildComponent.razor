@@ -1,0 +1,30 @@
+﻿<div>
+    <div class="alert aler-info">@title</div>
+    <span>
+        @if(childContent == null)
+        {
+            <span>This is the default message when the childcontent is empty.</span>
+        }
+        else
+        {
+            <span>Hooray the child content is not empty.. I will put the danger content below first and then the child content second</span><br />
+
+            @childContent<br />
+            @dangerContent<br />
+        }
+    </span>
+</div>
+<button class="btn btn-danger" @onclick="OnClickEventCallback">BUtton</button>
+<GrandChildConponent></GrandChildConponent>
+@code {
+    [Parameter]
+    public string title{ get; set; }
+    [Parameter]
+    public RenderFragment childContent { get; set; }
+    [Parameter]
+    public RenderFragment dangerContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickEventCallback{ get; set; }
+
+}

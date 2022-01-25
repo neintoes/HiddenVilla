@@ -1,0 +1,99 @@
+﻿@page "/bindProp"
+@*<h1>Hello, world!</h1>
+
+    Welcome to your new app.
+
+    <SurveyPrompt Title="How is Blazor working for you?" />*@
+
+<h2 class="bg-light border p-2">
+    First Hotel Room
+</h2>
+Room: @newRoom.RoomName
+<br />
+Price: @newRoom.Price
+<br />
+<input type="checkbox" @bind-value="@newRoom.IsActive" checked="@(newRoom.IsActive)" />
+Availability:
+<br />
+<span>@(newRoom.IsActive?"This room is available for booking.":"This room is unavailable for booking right now.")</span>
+<br />
+
+<select @bind="selectedRoomProp">
+    @foreach(var prop in newRoom.RoomProps)
+    { 
+        <option value="@prop.Name">@prop.Name</option>
+    }
+</select>
+<span>The room property selected is: @selectedRoomProp</span>
+<br/>
+
+<table class="table table-dark">
+    <tbody>
+        @foreach(var room in allRooms)
+        {
+            <tr>
+                <th scope="row"><input type="text" @bind-value="room.RoomName" @bind-value:event="oninput"/></th>
+                <td><input type="text" @bind-value="room.Price" @bind-value:event="oninput" /></td>
+                @foreach(var prop in room.RoomProps)
+                {
+                    <td>@prop.Name: @prop.Value</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    @foreach(var room in allRooms)
+    {
+        <span>The @room.RoomName is available for £@room.Price per night.</span>
+        <br />
+    }
+</p>
+
+@code{
+    string selectedRoomProp = "";
+    List<BlazorRoom> allRooms = new List<BlazorRoom>();
+    BlazorRoom newRoom = new BlazorRoom()
+    {
+        Id = 1,
+        RoomName = "Hudson Suite",
+        Price = 320,
+        IsActive = false,
+        RoomProps = new List<BlazorRoomProp>()
+    {
+            new BlazorRoomProp{Id = 1, Name = "Sq Ft", Value = "100"},
+            new BlazorRoomProp{Id = 2, Name = "Occupancy", Value= "3"}
+        }
+    };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        allRooms.Add(new BlazorRoom()
+        {
+            Id = 1,
+            RoomName = "Hudson Suite",
+            Price = 320,
+            IsActive = false,
+            RoomProps = new List<BlazorRoomProp>()
+            {
+                new BlazorRoomProp{Id = 1, Name = "Sq Ft", Value = "100"},
+                new BlazorRoomProp{Id = 2, Name = "Occupancy", Value= "3"}
+            }
+        });
+
+        allRooms.Add(new BlazorRoom()
+        {
+            Id = 1,
+            RoomName = "Jefferson Suite",
+            Price = 380,
+            IsActive = false,
+            RoomProps = new List<BlazorRoomProp>()
+            {
+                new BlazorRoomProp{Id = 1, Name = "Sq Ft", Value = "180"},
+                new BlazorRoomProp{Id = 2, Name = "Occupancy", Value= "4"}
+            }
+        });
+    }
+}

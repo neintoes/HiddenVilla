@@ -1,0 +1,28 @@
+﻿@page "/parentComponent"
+
+<h1 class="text-danger">Parent Child Component</h1>
+<CascadingValue Value= "@messageForGrandChild" Name="MessageFromGrandParent">
+    <CascadingValue Value = "luckyNumForGrandChild" Name="LuckyNumberFromGrandParent">
+        <ChildComponent OnClickEventCallback="ShowMessage" title="This title has been passed as a parameter from the parent component">
+            <childContent>THis is the input text fromt the parent under 'childcontent'</childContent>
+            <dangerContent>This is the input from the parent under 'dangercontent'</dangerContent>
+        </ChildComponent>
+    </CascadingValue>
+</CascadingValue>
+<AnotherChildComponent componentTitle="Default dictionary component"></AnotherChildComponent>
+
+<AnotherChildComponent componentTitle="Component receiving dictionary from the parent." placeholder="placeholderDefault"></AnotherChildComponent>
+
+<p>@messageText</p>
+
+@code {
+    string messageText = "";
+    private string messageForGrandChild = "Hello grandchild this is parent. Coming at you through cascading values.";
+    private int luckyNumForGrandChild = 16;
+
+    private void ShowMessage(MouseEventArgs e)
+    {
+        messageText = "THe button has been clicked and the callback has been initiated.";
+    }
+
+}

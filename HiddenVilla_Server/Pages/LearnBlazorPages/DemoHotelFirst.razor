@@ -1,0 +1,112 @@
+﻿@page "/demoHotelFirst"
+@using Model;
+<h1>Hotel Rooms</h1>
+
+<table class="table table-primary">
+    <thead>
+        <tr>
+            <th scope="col">Room List:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(allRooms.Count <= 3)
+        {
+        <tr>
+            <th scope="row">
+                @foreach (var room in allRooms)
+                {
+                <td class="table-secondary">
+                    <div>
+                        <h3>Room - @room.Id </h3><br />
+                        @room.RoomName<br />
+                        £@room.Price.00<br />
+                        <input type="checkbox" @bind-value="@room.IsActive" checked="@room.IsActive" /> Room is @(room.IsActive?"available.":"unavailable.") <br />
+                        @if (room.IsActive)
+                        {
+                            @foreach (var prop in room.RoomProps)
+                            {
+                                <span>@prop.Name - @prop.Value </span>
+                                <br />
+                            }
+                        }
+                        <button type="button" class="btn btn-danger"> Delete</button>
+                        <button type="button" class="btn btn-success">Edit</button>
+                    </div>
+                </td>
+            }</th>
+            </tr>
+        } else if (allRooms.Count > 3)
+        {
+            int roomCount = allRooms.Count;
+                while (roomCount > 0)
+                {
+
+                }
+        }
+
+@*        <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>sup</td>
+        </tr>
+        <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>s</td>
+        </tr>
+        <tr>
+            <th scope="row">3</th>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>sup</td>
+        </tr>*@
+    </tbody>
+</table>
+
+@code{
+    List<BlazorRoom> allRooms = new List<BlazorRoom>();
+    BlazorRoom newRoom = new BlazorRoom()
+    {
+        Id = 1,
+        RoomName = "Hudson Suite",
+        Price = 320,
+        IsActive = false,
+        RoomProps = new List<BlazorRoomProp>()
+        {
+            new BlazorRoomProp { Id = 1, Name = "Sq Ft", Value = "100" },
+            new BlazorRoomProp { Id = 2, Name = "Occupancy", Value = "3" }
+        }
+    };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        allRooms.Add(new BlazorRoom()
+        {
+            Id = 1,
+            RoomName = "Hudson Suite",
+            Price = 320,
+            IsActive = false,
+            RoomProps = new List<BlazorRoomProp>()
+            {
+                new BlazorRoomProp{Id = 1, Name = "Sq Ft", Value = "100"},
+                new BlazorRoomProp{Id = 2, Name = "Occupancy", Value= "3"}
+            }
+        });
+
+        allRooms.Add(new BlazorRoom()
+        {
+            Id = 1,
+            RoomName = "Jefferson Suite",
+            Price = 380,
+            IsActive = false,
+            RoomProps = new List<BlazorRoomProp>()
+            {
+                new BlazorRoomProp{Id = 1, Name = "Sq Ft", Value = "180"},
+                new BlazorRoomProp{Id = 2, Name = "Occupancy", Value= "4"}
+            }
+        });
+    }
+}

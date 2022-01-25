@@ -1,0 +1,122 @@
+﻿@page "/hotel-room/create"
+@page "/hotel-room/edit/{HotelRoomId:int}"
+@using Models;
+@using Business.Repository
+@using Business.Repository.IRepoosiory
+@*So what's happening here is I'm declaring a variable of a type of the interface?? and that's actually the name of the variable next to it
+NOT an actual reference to he HotelRoomRespository class.*@
+@inject IHotelRoomRepository hotelRoomRepository
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+    <div class="row mt-2 mb-5">
+        <h3 class="card-title text-info mb-3 ml-3">@title Hotel Room</h3>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <EditForm Model="@roomModel" OnValidSubmit="HandleHotelRoomUpsert">
+                        <DataAnnotationsValidator/>
+                        <div class="form-group">
+                            <label>Room Name:</label>
+                            <InputText @bind-Value="roomModel.Name"></InputText>
+                            <ValidationMessage For="() =>roomModel.Name"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Room occupants:</label>
+                            <InputNumber @bind-Value="roomModel.Occupancy"></InputNumber>
+                            <ValidationMessage For="()=> roomModel.Occupancy"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Regular Nightly Rate:</label>
+                            <InputNumber @bind-Value="roomModel.RegularRate"></InputNumber>
+                            <ValidationMessage For="()=>roomModel.RegularRate"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Room Description:</label>
+                            <InputTextArea @bind-Value="roomModel.Details"></InputTextArea>
+                        </div>
+                        <div class="form-group">
+                            <label>Square footage:</label>
+                            <InputText @bind-Value="roomModel.SqFt"></InputText>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary">@title Room</button>
+                            <NavLink href="hotel-room" class="btn btn-secondary">Back to Index</NavLink>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@code {
+    [Parameter]
+    public int? HotelRoomId { get; set; }
+
+    private string title = "";
+    private HotelRoomDTO roomModel = new HotelRoomDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(HotelRoomId == null)
+        {
+            //method is create
+            title = "Create";
+        }
+        else
+        {
+            //method is update
+            title = "Edit";
+            roomModel = await hotelRoomRepository.GetHotelRoom(HotelRoomId.Value);
+        }
+    }
+
+    private async Task HandleHotelRoomUpsert()
+    {
+        try
+        {
+            var isRoomUnique = await hotelRoomRepository.IsHotelUnique(roomModel.Name);
+            if (isRoomUnique != null)
+            {
+                await ErrorPress("Uh Oh! It seems that Hotel room name is already taken.", "Please try naming it something else.");
+                return;
+            }
+            //else if the room is not taken..
+            else
+            {
+                if(HotelRoomId == null)
+                {
+                    //Handling create form input
+                    Console.WriteLine("Submitting form.");
+
+                    var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
+                    await SuccessPress($"{roomModel.Name} has been successfully entered into the system.");
+                }
+                else
+                {
+                    //Handling update form input
+                    var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
+                    await SuccessPress($"{roomModel.Name} has been successfully updated in our system.");
+                }
+                NavigationManager.NavigateTo("hotel-room");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+        //Check to see if the room name is already taken, and prompt the user if so. 
+
+    }
+
+    //JS button alerts.
+    private async Task ErrorPress(string inputMessage, string inputMessageTwo)
+    {
+        await JSRuntime.SwalError(inputMessage, inputMessageTwo);
+    }
+
+    private async Task SuccessPress(string inputMessage)
+    {
+        await JSRuntime.ToastrSuccess(inputMessage);
+    }
+}

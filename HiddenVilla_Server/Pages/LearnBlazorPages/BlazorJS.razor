@@ -1,0 +1,45 @@
+﻿@page "/blazorjs"
+@inject IJSRuntime JSRuntime
+
+<h3>BlazorJS</h3>
+<button class="btn btn-danger" @onclick="(()=>ErrorPress(message))">Danger Button</button>
+<button class="btn btn-warning" @onclick="(()=>WarningPress(message))">Warning Button</button>
+<button class="btn btn-success" @onclick ="(()=>SuccessPress(message))">Success Button</button>
+<button class="btn btn-success" @onclick= "(()=>SuccessSwal(messageOne, messageTwo))">SweetAlerts Success</button>
+<button class="btn btn-danger" @onclick= "(()=>ErrorSwal(messageOne, messageTwo))">SweetAlerts Error</button>
+
+@code {
+    string message = "Suck on deez";
+    string messageOne = "This is your first warning!";
+    string messageTwo = "And this is your second warning!";
+
+    private async Task ErrorPress(string message)
+    {
+        await JSRuntime.ToastrError(message);
+    }
+
+    private async Task WarningPress(string message)
+    {
+        await JSRuntime.ToastrWarning(message);
+    }
+
+    private async Task SuccessPress(string message)
+    {
+        await JSRuntime.ToastrSuccess(message);
+    }
+
+    private async Task SuccessSwal(string messageOne, string messageTwo)
+    {
+        await JSRuntime.SwalSuccess(messageOne, messageOne);
+    }
+
+    private async Task WarningSwal(string messageOne, string messageTwo){
+        await JSRuntime.SwalWarning(messageOne, messageOne);
+    }
+
+    private async Task ErrorSwal(string messageOne, string messageTwo)
+    {
+        await JSRuntime.SwalError(messageOne, messageOne);
+    }
+
+}

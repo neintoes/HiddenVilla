@@ -1,0 +1,21 @@
+﻿@page "/lifeCycle"
+
+<h1>Lifecycle page</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<div class="border">
+    <LifeCycleComponent></LifeCycleComponent>
+</div>
+
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

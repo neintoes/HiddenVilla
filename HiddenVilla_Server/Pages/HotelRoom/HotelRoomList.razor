@@ -1,0 +1,60 @@
+﻿@page "/hotel-room"
+@using Models
+@using Business.Repository
+@using Business.Repository.IRepoosiory
+@inject IHotelRoomRepository HotelRoomRepository
+@inject NavigationManager NavigationManager
+
+<div class="row mt-4">
+    <div class="col-8">
+        <h4 class="card-title text-info">Hotel Rooms</h4>
+    </div>
+    <div class="col-3 offset-1">
+        <NavLink href="hotel-room/create" class="btn btn-info form-control">Add New Room</NavLink>
+    </div>
+</div>
+<div class="shadow-sm mt-3 ml-2">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Room name</th>
+                <th scope="col">Maximum Occupancy</th>
+                <th scope="col">Regular Nightly Rate</th>
+                <th scope="col">Square Footage</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (hotelRooms.Any())
+            {
+                @foreach (var hotelRoom in hotelRooms)
+                {
+                    <tr>
+                        @*Try to add a link to this row that will go directly to the hotel room when such pages are made*@
+                        <th scope="row">@hotelRoom.Name</th>
+                        <td>@hotelRoom.Occupancy</td>
+                        <td>@hotelRoom.RegularRate.ToString("c") / night</td>
+                        <td>@hotelRoom.SqFt</td>
+                        <td><NavLink href=@($"/hotel-room/edit/{hotelRoom.HotelRoomId}") class="btn btn-primary">Edit room</NavLink> </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+    @code {
+    private IEnumerable<HotelRoomDTO> hotelRooms {get; set;}
+
+    protected async override Task OnInitializedAsync()
+    {
+        hotelRooms = await HotelRoomRepository.GetAllHotelRooms();
+    }
+}
