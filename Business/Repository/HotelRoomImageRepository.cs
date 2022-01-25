@@ -23,14 +23,21 @@ namespace Business.Repository
 
         public async Task<int> CreateHotelRoomImage(HotelRoomImageDTO image)
         {
-            HotelRoomImage hotelRoomImage = _mapper.Map<HotelRoomImageDTO,HotelRoomImage>(image);
-            await _db.HotelRoomImage.AddAsync(hotelRoomImage);
-            return await _db.SaveChangesAsync();
+            try
+            {
+                HotelRoomImage hotelRoomImage = _mapper.Map<HotelRoomImageDTO, HotelRoomImage>(image);
+                await _db.HotelRoomImage.AddAsync(hotelRoomImage);
+                return await _db.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public Task<int> DeleteImageByHotelRoomId(int hotelRoomId)
         {
-            throw new NotImplementedException();
+            HotelRoomImage hotelRoomImage = 
         }
 
         public Task<int> DeleteImageById(int id)
