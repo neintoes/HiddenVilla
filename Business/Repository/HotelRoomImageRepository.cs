@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Repository.IRepoosiory;
 using DataAccess.Data;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using System;
 using System.Collections.Generic;
@@ -35,19 +36,53 @@ namespace Business.Repository
             }
         }
 
-        public Task<int> DeleteImageByHotelRoomId(int hotelRoomId)
+        public async Task<int> DeleteImageById(int id)
         {
-            HotelRoomImage hotelRoomImage = 
+            try
+            {
+                var imageToBeDeleted = await _db.HotelRoomImage.FirstOrDefaultAsync(x => x.Id == id);
+                if (imageToBeDeleted != null)
+                {
+                    _db.HotelRoomImage.Remove(imageToBeDeleted);
+                    return await _db.SaveChangesAsync();
+                }
+                return 0;
+            } 
+            catch(Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
-        public Task<int> DeleteImageById(int id)
+        public async Task<int> DeleteImageByHotelRoomId(int hotelRoomId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var imagesToBeDeleted = await _db.HotelRoomImage.Where(x => x.RoomId == hotelRoomId).ToListAsync();
+                if (imagesToBeDeleted != null)
+                {
+                    _db.HotelRoomImage.RemoveRange(imagesToBeDeleted);
+                    return await _db.SaveChangesAsync();
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
-        public Task<IEnumerable<HotelRoomImageDTO>> GetImagesByHotelRoomId(int hotelRoomId)
+        public async Task<IEnumerable<HotelRoomImageDTO>> GetImagesByHotelRoomId(int hotelRoomId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _mapper.Map<IEnumerable<HotelRoomImage>, IEnumerable<HotelRoomImageDTO>>(
+                await _db.HotelRoomImage.Where(x => x.RoomId == hotelRoomId).ToListAsync());
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

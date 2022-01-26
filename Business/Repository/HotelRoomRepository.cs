@@ -83,7 +83,7 @@ namespace Business.Repository
                 await _db.SaveChangesAsync();
                 return _mapper.Map<RoomModel, HotelRoomDTO>(updatedRoom.Entity);
             }
-            catch(Exception ex)
+            catch
             {
                 return null;
             }
