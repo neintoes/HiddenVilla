@@ -39,15 +39,30 @@ NOT an actual reference to he HotelRoomRespository class.*@
                             <InputTextArea @bind-Value="roomModel.Details"></InputTextArea>
                         </div>
                         <div class="form-group">
-                            <label>Room image</label>
-                            <InputFile OnChange="HandleImageUpload" multiple></InputFile>
-                        </div>
-                        <div class="form-group">
-                            @*Code to go for image viewe*@
-                        </div>
-                        <div class="form-group">
                             <label>Square footage:</label>
                             <InputText @bind-Value="roomModel.SqFt"></InputText>
+                        </div>
+                        <div class="form-group">
+                            <InputFile OnChange="HandleImageUpload" multiple></InputFile>
+                            <div class="row">
+                                @if(roomModel.ImageUrls != null && roomModel.ImageUrls.Count >0)
+                                {
+                                    int serial = 1;
+                                    foreach(var roomImage in roomModel.ImageUrls)
+                                    {
+                                        <div class="col-md-2 mt-3">
+                                            <div class="room-image" style="background : url('@roomImage') 50% 50%; ">
+                                                <span class = "room-image-title">@serial</span>
+                                            </div>
+                                        
+                                            <button type="button" class="btn btn-outline-danger btn-block mt-4">
+                                                Delete
+                                            </button>
+                                        </div>
+                                        serial++;
+                                    }
+                                }
+                            </div>
                         </div>
                         <div class="form-group">
                             <button class="btn btn-primary">@title Room</button>

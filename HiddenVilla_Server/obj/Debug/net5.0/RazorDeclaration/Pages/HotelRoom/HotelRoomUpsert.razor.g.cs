@@ -148,7 +148,7 @@ using Service.IService;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 59 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+#line 77 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
        
     [Parameter]
     public int? HotelRoomId { get; set; }
