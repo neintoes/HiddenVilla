@@ -18,7 +18,6 @@
 
         public bool DeleteFile(string fileName)
         {
-            bool status = false;
             try
             {
                 var path = $"{_webHostEnvironment.WebRootPath}\\RoomImages\\{fileName}";
@@ -38,6 +37,12 @@
             }
         }
 
+        /// <summary>
+        /// UploadFile returns a string that is the filepath of the final uploaded file upon completion of the method. 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<string> UploadFile(IBrowserFile file)
         {
             try
@@ -63,6 +68,7 @@
 
                 await using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
                 {
+                    Console.WriteLine("got here.");
                     memoryStream.WriteTo(fs);
                 }
 
@@ -71,6 +77,7 @@
             }  
             catch(Exception ex)
             {
+                Console.WriteLine("This is an exception from FileUpload: " + ex.ToString());
                 throw new Exception(ex.ToString());
             }
 

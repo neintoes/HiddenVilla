@@ -3,11 +3,14 @@
 @using Models;
 @using Business.Repository
 @using Business.Repository.IRepoosiory
+@using System.IO
+@using Service.IService
 @*So what's happening here is I'm declaring a variable of a type of the interface?? and that's actually the name of the variable next to it
 NOT an actual reference to he HotelRoomRespository class.*@
 @inject IHotelRoomRepository hotelRoomRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IFileUpload FileUpload
 
     <div class="row mt-2 mb-5">
         <h3 class="card-title text-info mb-3 ml-3">@title Hotel Room</h3>
@@ -34,6 +37,13 @@ NOT an actual reference to he HotelRoomRespository class.*@
                         <div class="form-group">
                             <label>Room Description:</label>
                             <InputTextArea @bind-Value="roomModel.Details"></InputTextArea>
+                        </div>
+                        <div class="form-group">
+                            <label>Room image</label>
+                            <InputFile OnChange="HandleImageUpload" multiple></InputFile>
+                        </div>
+                        <div class="form-group">
+                            @*Code to go for image viewe*@
                         </div>
                         <div class="form-group">
                             <label>Square footage:</label>
@@ -107,6 +117,55 @@ NOT an actual reference to he HotelRoomRespository class.*@
         }
         //Check to see if the room name is already taken, and prompt the user if so. 
 
+    }
+
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var images = new List<string>();
+            if(e.FileCount > 0)
+            {
+                foreach(var file in e.GetMultipleFiles())
+                {
+                    FileInfo fileInfo = new FileInfo(file.Name);
+                    if(fileInfo.Extension.ToLower() == ".jpg" ||
+                    fileInfo.Extension.ToLower() == ".png" ||
+                    fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        //Upload the image file and add the filePath to the local images list.
+                        var uploadedImagePath = await FileUpload.UploadFile(file);
+                        images.Add(uploadedImagePath);
+                    }
+                    else
+                    {
+                        //Image is of incorrect file extension, prompt user to upload another file.
+                        await ErrorPress("Uh Oh! This file is of the incorrect type.", "Please upload a file ending in 'jpg','jpeg' or 'png'.");
+                        return;
+                    }
+                }
+                if (images.Any())
+                //if any images have been uploaded..
+                {
+                    if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any())
+                    //if there are already image URLS contained in the HotelRoomDTO...
+                    {
+                        roomModel.ImageUrls.AddRange(images);
+                    }
+                    else
+                    //else if there are none.
+                    {
+                        roomModel.ImageUrls = new List<string>();
+                        roomModel.ImageUrls.AddRange(images);
+                    }
+                }
+            }
+        } 
+        catch(Exception ex)
+        {
+            await ErrorPress(ex.ToString(), "failure");
+            new Exception(ex.ToString());
+        }
     }
 
     //JS button alerts.

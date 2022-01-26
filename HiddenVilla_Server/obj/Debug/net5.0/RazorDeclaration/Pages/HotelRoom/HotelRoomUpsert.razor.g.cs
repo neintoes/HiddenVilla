@@ -124,6 +124,20 @@ using Business.Repository.IRepoosiory;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 6 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+using System.IO;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 7 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+using Service.IService;
+
+#line default
+#line hidden
+#nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/hotel-room/create")]
     [Microsoft.AspNetCore.Components.RouteAttribute("/hotel-room/edit/{HotelRoomId:int}")]
     public partial class HotelRoomUpsert : Microsoft.AspNetCore.Components.ComponentBase
@@ -134,7 +148,7 @@ using Business.Repository.IRepoosiory;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 52 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+#line 59 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
        
     [Parameter]
     public int? HotelRoomId { get; set; }
@@ -195,6 +209,55 @@ using Business.Repository.IRepoosiory;
 
     }
 
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var images = new List<string>();
+            if(e.FileCount > 0)
+            {
+                foreach(var file in e.GetMultipleFiles())
+                {
+                    FileInfo fileInfo = new FileInfo(file.Name);
+                    if(fileInfo.Extension.ToLower() == ".jpg" ||
+                    fileInfo.Extension.ToLower() == ".png" ||
+                    fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        //Upload the image file and add the filePath to the local images list.
+                        var uploadedImagePath = await FileUpload.UploadFile(file);
+                        images.Add(uploadedImagePath);
+                    }
+                    else
+                    {
+                        //Image is of incorrect file extension, prompt user to upload another file.
+                        await ErrorPress("Uh Oh! This file is of the incorrect type.", "Please upload a file ending in 'jpg','jpeg' or 'png'.");
+                        return;
+                    }
+                }
+                if (images.Any())
+                //if any images have been uploaded..
+                {
+                    if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any())
+                    //if there are already image URLS contained in the HotelRoomDTO...
+                    {
+                        roomModel.ImageUrls.AddRange(images);
+                    }
+                    else
+                    //else if there are none.
+                    {
+                        roomModel.ImageUrls = new List<string>();
+                        roomModel.ImageUrls.AddRange(images);
+                    }
+                }
+            }
+        } 
+        catch(Exception ex)
+        {
+            await ErrorPress(ex.ToString(), "failure");
+            new Exception(ex.ToString());
+        }
+    }
+
     //JS button alerts.
     private async Task ErrorPress(string inputMessage, string inputMessageTwo)
     {
@@ -209,6 +272,7 @@ using Business.Repository.IRepoosiory;
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IFileUpload FileUpload { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager NavigationManager { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomRepository hotelRoomRepository { get; set; }

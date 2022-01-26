@@ -12,17 +12,19 @@ namespace Models
         [Key]
         public int HotelRoomId { get; set; }
 
-        [Required (ErrorMessage ="Please enter a name for the hotel room.")]
+        [Required(ErrorMessage = "Please enter a name for the hotel room.")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage ="Please enter an occupancy limit for the hotel room.")]
+        [Required(ErrorMessage = "Please enter an occupancy limit for the hotel room.")]
         public int Occupancy { get; set; }
 
-        [Required(ErrorMessage ="Please enter a regular nightly rate for the room.")]
+        [Required(ErrorMessage = "Please enter a regular nightly rate for the room.")]
         public double RegularRate { get; set; }
 
         public string Details { get; set; }
 
         public string SqFt { get; set; }
+        public virtual ICollection<HotelRoomImageDTO> HotelRoomImages { get; set; }
+        public List<string> ImageUrls {get; set;}
     }
 }

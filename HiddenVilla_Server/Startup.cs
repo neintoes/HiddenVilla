@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Business.Repository;
 using Business.Repository.IRepoosiory;
+using HiddenVilla_Server.Service.IService;
+using HiddenVilla_Server.Service;
 
 namespace HiddenVilla_Server
 {
@@ -30,14 +32,19 @@ namespace HiddenVilla_Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            //Code below for configuring the automapper
+            //Line below for configuring the automapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //Line below for configuring the HotelRoomRepository
+            services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
+            //Line below for the HotelRoomImageRepository
+            services.AddScoped<IHotelRoomImageRepository, HotelRoomImageRepository>();
+            //Line below for configuring the FileUpload
+            services.AddScoped<IFileUpload, FileUpload>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
