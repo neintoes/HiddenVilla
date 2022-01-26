@@ -10,7 +10,7 @@
             throw new System.NotImplementedException();
         }
 
-        Task<string> UploadFile(IBrowser browser)
+        public Task<string> UploadFile(IBrowser browser)
         {
             throw new System.NotImplementedException();
         }
