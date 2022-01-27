@@ -1,14 +1,22 @@
 ﻿@page "/blazorjs"
+@using DataAccess.Data
+@using Business.Repository
+@using Business.Repository.IRepoosiory
+@using Models
 @inject IJSRuntime JSRuntime
+@inject IHotelRoomRepository HotelRoomRepository
+@inject IHotelRoomImageRepository HotelRoomImageRepository
 
 <h3>BlazorJS</h3>
 <button class="btn btn-danger" @onclick="(()=>ErrorPress(message))">Danger Button</button>
 <button class="btn btn-warning" @onclick="(()=>WarningPress(message))">Warning Button</button>
 <button class="btn btn-success" @onclick ="(()=>SuccessPress(message))">Success Button</button>
-<button class="btn btn-success" @onclick= "(()=>SuccessSwal(messageOne, messageTwo))">SweetAlerts Success</button>
-<button class="btn btn-danger" @onclick= "(()=>ErrorSwal(messageOne, messageTwo))">SweetAlerts Error</button>
+@*CHANGE THE ONCLICK METHODS BELOW*@
+<button class="btn btn-danger" @onclick= "DropHotelRoomTable">Secret: Delete all hotel room images</button>
+<button class="btn btn-danger" @onclick= "DropHotelRoomImageTable">Secret: Delete all hotel rooms</button>
 
 @code {
+    ApplicationDbContext _db;
     string message = "Suck on deez";
     string messageOne = "This is your first warning!";
     string messageTwo = "And this is your second warning!";
@@ -40,6 +48,38 @@
     private async Task ErrorSwal(string messageOne, string messageTwo)
     {
         await JSRuntime.SwalError(messageOne, messageOne);
+    }
+
+    private async Task DropHotelRoomTable()
+    {
+        try
+        {
+            IEnumerable<HotelRoomDTO> hotelRooms = await HotelRoomRepository.GetAllHotelRooms();
+            foreach(var hotelRoom in hotelRooms)
+            {
+                await HotelRoomRepository.DeleteHotelRoom(hotelRoom.HotelRoomId);
+            }
+            await SuccessPress("All hotel rooms deleted.");
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
+    private async Task DropHotelRoomImageTable()
+    {
+        try
+        {
+            IEnumerable<HotelRoomImageDTO> hotelRoomImages = await HotelRoomImageRepository.GetAllHotelRoomImages();
+            foreach(var hotelRoomImage in hotelRoomImages)
+            {
+                await HotelRoomImageRepository.DeleteImageById(hotelRoomImage.Id);
+            }
+            await SuccessPress("All hotel room images deleted.");
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
     }
 
 }

@@ -139,7 +139,7 @@ using Business.Repository.IRepoosiory;
 
     protected async override Task OnInitializedAsync()
     {
-        hotelRooms = await HotelRoomRepository.GetAllHotelRooms();
+        hotelRooms = await HotelRoomRepository.GetAllHotelRoomsWithImages();
     }
 
 #line default

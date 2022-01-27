@@ -82,7 +82,10 @@ NOT an actual reference to he HotelRoomRespository class.*@
     private string title = "";
     private HotelRoomDTO roomModel = new HotelRoomDTO();
     //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
-    private HotelRoomImageDTO hotelRoomImageDTO;
+    private HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
+
+    string preExistingHotelName;
+    List<string> preExistingImageUrls = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +99,16 @@ NOT an actual reference to he HotelRoomRespository class.*@
             //method is update
             title = "Edit";
             roomModel = await hotelRoomRepository.GetHotelRoom(HotelRoomId.Value);
+            preExistingHotelName = roomModel.Name;
+            roomModel.ImageUrls = new List<string>();
+            if(roomModel.Images != null)
+            {
+                foreach(HotelRoomImageDTO image in roomModel.Images)
+                {
+                    roomModel.ImageUrls.Add(image.ImageUrl);
+                    preExistingImageUrls.Add(image.ImageUrl);
+                }
+            }
         }
     }
 
@@ -103,32 +116,37 @@ NOT an actual reference to he HotelRoomRespository class.*@
     {
         try
         {
-            var isRoomUnique = await hotelRoomRepository.IsHotelUnique(roomModel.Name);
-            if (isRoomUnique != null)
+            //If the name of the hotel has been changed, then it will be checked to see if it is unique.
+            //If it is not unique then the method will return.
+            if(roomModel.Name != preExistingHotelName)
             {
-                await ErrorPress("Uh Oh! It seems that Hotel room name is already taken.", "Please try naming it something else.");
-                return;
+                var isRoomUnique = await hotelRoomRepository.IsHotelUnique(roomModel.Name);
+                if (isRoomUnique != null)
+                {
+                    await ErrorPress("Uh Oh! It seems that Hotel room name is already taken.", "Please try naming it something else.");
+                    return;
+                }
             }
-            //else if the room is not taken..
+
+            if(HotelRoomId == null)
+            {
+                //Handling create form input
+                Console.WriteLine("Submitting form.");
+
+                var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
+                await AddHotelRoomImage(createdRoom);
+                await SuccessPress("The newly created hotel room Id is: " + createdRoom.HotelRoomId);
+                await SuccessPress($"{roomModel.Name} has been successfully entered into the system.");
+            }
             else
             {
-                if(HotelRoomId == null)
-                {
-                    //Handling create form input
-                    Console.WriteLine("Submitting form.");
-
-                    var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
-                    AddHotelRoomImage(createdRoom);
-                    await SuccessPress($"{roomModel.Name} has been successfully entered into the system.");
-                }
-                else
-                {
-                    //Handling update form input
-                    var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
-                    await SuccessPress($"{roomModel.Name} has been successfully updated in our system.");
-                }
-                NavigationManager.NavigateTo("hotel-room");
+                //Handling update form input
+                var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
+                await AddHotelRoomImage(updatedRoom);
+                await SuccessPress($"{roomModel.Name} has been successfully updated in our system.");
             }
+            NavigationManager.NavigateTo("hotel-room");
+
         }
         catch (Exception ex)
         {
@@ -187,15 +205,37 @@ NOT an actual reference to he HotelRoomRespository class.*@
         }
     }
 
-    private async Task AddHotelRoomImage(HotelRoomDTO newRoom)
+    private async Task AddHotelRoomImage(HotelRoomDTO createdRoom)
     {
-        foreach(var image in roomModel.ImageUrls)
         {
-            HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
-            imageDTO.RoomId = newRoom.HotelRoomId;
-            imageDTO.ImageUrl = image;
+            if (title == "Create")
+            {
+                foreach (var imageUrl in roomModel.ImageUrls)
+                {
+                    imageDTO = new HotelRoomImageDTO()
+                    {
+                        HotelRoomId = createdRoom.HotelRoomId,
+                        ImageUrl = imageUrl
+                    };
+                    await hotelRoomImageRepository.CreateHotelRoomImage(imageDTO);
+                }
+            }
+            else
+            {
+                foreach (var imageUrl in roomModel.ImageUrls)
+                {
+                    if (roomModel.Images.Where(x => x.ImageUrl == imageUrl).Count() == 0)
+                    {
 
-            await hotelRoomImageRepository.CreateHotelRoomImage(imageDTO);
+                        imageDTO = new HotelRoomImageDTO()
+                        {
+                            HotelRoomId = createdRoom.HotelRoomId,
+                            ImageUrl = imageUrl
+                        };
+                        await hotelRoomImageRepository.CreateHotelRoomImage(imageDTO);
+                    }
+                }   
+            }
         }
     }
 

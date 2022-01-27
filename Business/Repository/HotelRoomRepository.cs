@@ -33,6 +33,13 @@ namespace Business.Repository
             return _mapper.Map<RoomModel, HotelRoomDTO>(addedHotelRoom.Entity);
         }
 
+        public async Task<IEnumerable<HotelRoomDTO>> GetAllHotelRoomsWithImages()
+        {
+            IEnumerable<HotelRoomDTO> hotelRooms = _mapper.Map<IEnumerable<RoomModel>, IEnumerable<HotelRoomDTO>>(_db.RoomModel.Include(x=>x.Images));
+
+            return hotelRooms;
+        }
+
         public async Task<IEnumerable<HotelRoomDTO>> GetAllHotelRooms()
         {
             IEnumerable<HotelRoomDTO> hotelRooms = _mapper.Map<IEnumerable<RoomModel>, IEnumerable<HotelRoomDTO>>(_db.RoomModel);
@@ -44,7 +51,7 @@ namespace Business.Repository
         {
             try
             {
-                return _mapper.Map<RoomModel, HotelRoomDTO>(await _db.RoomModel.FirstOrDefaultAsync(x => x.HotelRoomId == hotelRoomId));
+                return _mapper.Map<RoomModel, HotelRoomDTO>(await _db.RoomModel.Include(x=>x.Images).FirstOrDefaultAsync(x => x.HotelRoomId == hotelRoomId));
             }
             catch (Exception ex)
             {

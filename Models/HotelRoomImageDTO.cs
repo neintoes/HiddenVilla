@@ -9,7 +9,7 @@ namespace Models
     public class HotelRoomImageDTO
     {
         public int Id { get; set; }
-        public int RoomId { get; set; }
+        public int HotelRoomId { get; set; }
         public string ImageUrl { get; set; }
     }
 }

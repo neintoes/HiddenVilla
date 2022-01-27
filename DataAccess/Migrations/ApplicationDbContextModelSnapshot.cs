@@ -26,14 +26,11 @@ namespace DataAccess.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("HotelRoomId")
+                    b.Property<int>("HotelRoomId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -86,7 +83,9 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("DataAccess.Data.RoomModel", "RoomModel")
                         .WithMany("Images")
-                        .HasForeignKey("HotelRoomId");
+                        .HasForeignKey("HotelRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("RoomModel");
                 });

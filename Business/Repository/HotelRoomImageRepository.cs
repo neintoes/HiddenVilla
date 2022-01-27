@@ -58,7 +58,7 @@ namespace Business.Repository
         {
             try
             {
-                var imagesToBeDeleted = await _db.HotelRoomImage.Where(x => x.RoomId == hotelRoomId).ToListAsync();
+                var imagesToBeDeleted = await _db.HotelRoomImage.Where(x => x.HotelRoomId == hotelRoomId).ToListAsync();
                 if (imagesToBeDeleted != null)
                 {
                     _db.HotelRoomImage.RemoveRange(imagesToBeDeleted);
@@ -77,12 +77,19 @@ namespace Business.Repository
             try
             {
                 return _mapper.Map<IEnumerable<HotelRoomImage>, IEnumerable<HotelRoomImageDTO>>(
-                await _db.HotelRoomImage.Where(x => x.RoomId == hotelRoomId).ToListAsync());
+                await _db.HotelRoomImage.Where(x => x.HotelRoomId == hotelRoomId).ToListAsync());
             }
             catch(Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
+        }
+
+        public async Task<IEnumerable<HotelRoomImageDTO>> GetAllHotelRoomImages()
+        {
+            IEnumerable<HotelRoomImageDTO> hotelRoomImages = _mapper.Map<IEnumerable<HotelRoomImage>, IEnumerable<HotelRoomImageDTO>>(_db.HotelRoomImage);
+
+            return hotelRoomImages;
         }
     }
 }

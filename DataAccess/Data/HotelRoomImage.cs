@@ -10,7 +10,7 @@ namespace DataAccess.Data
     public class HotelRoomImage
     {
         public int Id { get; set; }
-        public int RoomId { get; set; }
+        public int HotelRoomId{ get; set; }
         public string ImageUrl { get; set; }
         [ForeignKey("HotelRoomId")]
         public virtual RoomModel RoomModel { get; set; }

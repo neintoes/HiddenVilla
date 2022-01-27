@@ -103,6 +103,34 @@ using HiddenVilla_Server.Helper;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 2 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+using DataAccess.Data;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 3 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+using Business.Repository;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 4 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+using Business.Repository.IRepoosiory;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 5 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+using Models;
+
+#line default
+#line hidden
+#nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/blazorjs")]
     public partial class BlazorJS : Microsoft.AspNetCore.Components.ComponentBase
     {
@@ -112,8 +140,9 @@ using HiddenVilla_Server.Helper;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 11 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+#line 18 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
        
+    ApplicationDbContext _db;
     string message = "Suck on deez";
     string messageOne = "This is your first warning!";
     string messageTwo = "And this is your second warning!";
@@ -147,10 +176,44 @@ using HiddenVilla_Server.Helper;
         await JSRuntime.SwalError(messageOne, messageOne);
     }
 
+    private async Task DropHotelRoomTable()
+    {
+        try
+        {
+            IEnumerable<HotelRoomDTO> hotelRooms = await HotelRoomRepository.GetAllHotelRooms();
+            foreach(var hotelRoom in hotelRooms)
+            {
+                await HotelRoomRepository.DeleteHotelRoom(hotelRoom.HotelRoomId);
+            }
+            await SuccessPress("All hotel rooms deleted.");
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
+    private async Task DropHotelRoomImageTable()
+    {
+        try
+        {
+            IEnumerable<HotelRoomImageDTO> hotelRoomImages = await HotelRoomImageRepository.GetAllHotelRoomImages();
+            foreach(var hotelRoomImage in hotelRoomImages)
+            {
+                await HotelRoomImageRepository.DeleteImageById(hotelRoomImage.Id);
+            }
+            await SuccessPress("All hotel room images deleted.");
+        }catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomImageRepository HotelRoomImageRepository { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomRepository HotelRoomRepository { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
     }
 }
