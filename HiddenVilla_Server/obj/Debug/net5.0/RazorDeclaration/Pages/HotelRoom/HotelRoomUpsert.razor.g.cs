@@ -148,13 +148,15 @@ using Service.IService;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 77 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+#line 78 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
        
     [Parameter]
     public int? HotelRoomId { get; set; }
 
     private string title = "";
     private HotelRoomDTO roomModel = new HotelRoomDTO();
+    //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
+    private HotelRoomImageDTO hotelRoomImageDTO;
 
     protected override async Task OnInitializedAsync()
     {
@@ -190,6 +192,7 @@ using Service.IService;
                     Console.WriteLine("Submitting form.");
 
                     var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
+                    AddHotelRoomImage(createdRoom);
                     await SuccessPress($"{roomModel.Name} has been successfully entered into the system.");
                 }
                 else
@@ -258,6 +261,18 @@ using Service.IService;
         }
     }
 
+    private async Task AddHotelRoomImage(HotelRoomDTO newRoom)
+    {
+        foreach(var image in roomModel.ImageUrls)
+        {
+            HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
+            imageDTO.RoomId = newRoom.HotelRoomId;
+            imageDTO.ImageUrl = image;
+
+            await hotelRoomImageRepository.CreateHotelRoomImage(imageDTO);
+        }
+    }
+
     //JS button alerts.
     private async Task ErrorPress(string inputMessage, string inputMessageTwo)
     {
@@ -275,6 +290,7 @@ using Service.IService;
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IFileUpload FileUpload { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager NavigationManager { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomImageRepository hotelRoomImageRepository { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomRepository hotelRoomRepository { get; set; }
     }
 }

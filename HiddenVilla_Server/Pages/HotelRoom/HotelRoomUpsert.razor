@@ -8,6 +8,7 @@
 @*So what's happening here is I'm declaring a variable of a type of the interface?? and that's actually the name of the variable next to it
 NOT an actual reference to he HotelRoomRespository class.*@
 @inject IHotelRoomRepository hotelRoomRepository
+@inject IHotelRoomImageRepository hotelRoomImageRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IFileUpload FileUpload
@@ -80,6 +81,8 @@ NOT an actual reference to he HotelRoomRespository class.*@
 
     private string title = "";
     private HotelRoomDTO roomModel = new HotelRoomDTO();
+    //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
+    private HotelRoomImageDTO hotelRoomImageDTO;
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,6 +118,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
                     Console.WriteLine("Submitting form.");
 
                     var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
+                    AddHotelRoomImage(createdRoom);
                     await SuccessPress($"{roomModel.Name} has been successfully entered into the system.");
                 }
                 else
@@ -180,6 +184,18 @@ NOT an actual reference to he HotelRoomRespository class.*@
         {
             await ErrorPress(ex.ToString(), "failure");
             new Exception(ex.ToString());
+        }
+    }
+
+    private async Task AddHotelRoomImage(HotelRoomDTO newRoom)
+    {
+        foreach(var image in roomModel.ImageUrls)
+        {
+            HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
+            imageDTO.RoomId = newRoom.HotelRoomId;
+            imageDTO.ImageUrl = image;
+
+            await hotelRoomImageRepository.CreateHotelRoomImage(imageDTO);
         }
     }
 
