@@ -313,6 +313,25 @@ using Service.IService;
         }
     }
 
+    internal async Task DeletePhoto(string imageUrl)
+    {
+        try
+        {
+            //finding and deleting the selected image from the RoomImages folder.
+            var imageIndex = roomModel.ImageUrls.FindIndex(x => x == imageUrl);
+            var imageName = imageUrl.Replace($"RoomImages/", "");
+            if(roomModel.HotelRoomId == 0 && title == "Create")
+            {
+                var result = FileUpload.DeleteFile(imageName);
+            }
+            roomModel.ImageUrls.RemoveAt(imageIndex);
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+
+    }
+
     //JS button alerts.
     private async Task ErrorPress(string inputMessage, string inputMessageTwo)
     {
