@@ -160,6 +160,7 @@ using Service.IService;
 
     string preExistingHotelName;
     List<string> preExistingImageUrls = new List<string>();
+    private List<string> imagesToBeDeleted = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -192,7 +193,7 @@ using Service.IService;
         {
             //If the name of the hotel has been changed, then it will be checked to see if it is unique.
             //If it is not unique then the method will return.
-            if(roomModel.Name != preExistingHotelName)
+            if(roomModel.Name != preExistingHotelName || preExistingHotelName == null)
             {
                 var isRoomUnique = await hotelRoomRepository.IsHotelUnique(roomModel.Name);
                 if (isRoomUnique != null)
@@ -202,7 +203,7 @@ using Service.IService;
                 }
             }
 
-            if(HotelRoomId == null)
+            if(HotelRoomId == null && title=="Create")
             {
                 //Handling create form input
                 Console.WriteLine("Submitting form.");
@@ -216,6 +217,15 @@ using Service.IService;
             {
                 //Handling update form input
                 var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
+                if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any() || (imagesToBeDeleted != null && imagesToBeDeleted.Any()))
+                {
+                    foreach(var imageToBeDeletedUrl in imagesToBeDeleted)
+                    {
+                        var imageName = imageToBeDeletedUrl.Replace($"RoomImages/", "");
+                        var result = FileUpload.DeleteFile(imageName);
+                        await hotelRoomImageRepository.DeleteImageByImageUrl(imageToBeDeletedUrl);
+                    }
+                }
                 await AddHotelRoomImage(updatedRoom);
                 await SuccessPress($"{roomModel.Name} has been successfully updated in our system.");
             }
@@ -320,10 +330,19 @@ using Service.IService;
             //finding and deleting the selected image from the RoomImages folder.
             var imageIndex = roomModel.ImageUrls.FindIndex(x => x == imageUrl);
             var imageName = imageUrl.Replace($"RoomImages/", "");
+
+            //Handling method when on the create form
             if(roomModel.HotelRoomId == 0 && title == "Create")
             {
                 var result = FileUpload.DeleteFile(imageName);
             }
+            //Handling the method when on teh edit/update form.
+            else
+            {
+                imagesToBeDeleted ??= new List<string>();
+                imagesToBeDeleted.Add(imageUrl);
+            }
+            //This statement removes the images from the UI
             roomModel.ImageUrls.RemoveAt(imageIndex);
         } catch(Exception ex)
         {
