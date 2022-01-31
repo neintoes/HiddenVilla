@@ -90,9 +90,9 @@ namespace Business.Repository
                 await _db.SaveChangesAsync();
                 return _mapper.Map<RoomModel, HotelRoomDTO>(updatedRoom.Entity);
             }
-            catch
+            catch(Exception ex)
             {
-                return null;
+                throw new Exception(ex.ToString());
             }
             
         }

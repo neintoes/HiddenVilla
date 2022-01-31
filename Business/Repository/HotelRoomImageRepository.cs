@@ -75,8 +75,13 @@ namespace Business.Repository
         public async Task<int> DeleteImageByImageUrl(string imageUrl)
         {
             var imagesToBeDeleted = await _db.HotelRoomImage.FirstOrDefaultAsync(x=> x.ImageUrl.ToLower() == imageUrl.ToLower());
-            _db.HotelRoomImage.Remove(imagesToBeDeleted);
-            return await _db.SaveChangesAsync();
+            if(imagesToBeDeleted != null)
+            {
+                _db.HotelRoomImage.Remove(imagesToBeDeleted);
+                return await _db.SaveChangesAsync();
+            }
+            Console.WriteLine("No images in the db of name: " + imageUrl);
+            return 0;
         }
 
         public async Task<IEnumerable<HotelRoomImageDTO>> GetImagesByHotelRoomId(int hotelRoomId)

@@ -131,6 +131,13 @@ using Models;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 6 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+using Service.IService;
+
+#line default
+#line hidden
+#nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/blazorjs")]
     public partial class BlazorJS : Microsoft.AspNetCore.Components.ComponentBase
     {
@@ -140,7 +147,7 @@ using Models;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 18 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+#line 20 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
        
     ApplicationDbContext _db;
     string message = "Suck on deez";
@@ -199,7 +206,9 @@ using Models;
             IEnumerable<HotelRoomImageDTO> hotelRoomImages = await HotelRoomImageRepository.GetAllHotelRoomImages();
             foreach(var hotelRoomImage in hotelRoomImages)
             {
+                var imageName = hotelRoomImage.ImageUrl.Replace($"RoomImages/", "");
                 await HotelRoomImageRepository.DeleteImageById(hotelRoomImage.Id);
+                var result = FileUpload.DeleteFile(imageName);
             }
             await SuccessPress("All hotel room images deleted.");
         }catch(Exception ex)
@@ -214,6 +223,7 @@ using Models;
 #nullable disable
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomImageRepository HotelRoomImageRepository { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomRepository HotelRoomRepository { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IFileUpload FileUpload { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
     }
 }

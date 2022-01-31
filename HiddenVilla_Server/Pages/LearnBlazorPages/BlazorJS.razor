@@ -3,7 +3,9 @@
 @using Business.Repository
 @using Business.Repository.IRepoosiory
 @using Models
+@using Service.IService
 @inject IJSRuntime JSRuntime
+@inject IFileUpload FileUpload
 @inject IHotelRoomRepository HotelRoomRepository
 @inject IHotelRoomImageRepository HotelRoomImageRepository
 
@@ -12,8 +14,8 @@
 <button class="btn btn-warning" @onclick="(()=>WarningPress(message))">Warning Button</button>
 <button class="btn btn-success" @onclick ="(()=>SuccessPress(message))">Success Button</button>
 @*CHANGE THE ONCLICK METHODS BELOW*@
-<button class="btn btn-danger" @onclick= "DropHotelRoomTable">Secret: Delete all hotel room images</button>
-<button class="btn btn-danger" @onclick= "DropHotelRoomImageTable">Secret: Delete all hotel rooms</button>
+<button class="btn btn-danger" @onclick="DropHotelRoomImageTable">Secret: Delete all hotel room images</button>
+<button class="btn btn-danger" @onclick= "DropHotelRoomTable">Secret: Delete all hotel rooms</button>
 
 @code {
     ApplicationDbContext _db;
@@ -73,7 +75,9 @@
             IEnumerable<HotelRoomImageDTO> hotelRoomImages = await HotelRoomImageRepository.GetAllHotelRoomImages();
             foreach(var hotelRoomImage in hotelRoomImages)
             {
+                var imageName = hotelRoomImage.ImageUrl.Replace($"RoomImages/", "");
                 await HotelRoomImageRepository.DeleteImageById(hotelRoomImage.Id);
+                var result = FileUpload.DeleteFile(imageName);
             }
             await SuccessPress("All hotel room images deleted.");
         }catch(Exception ex)
