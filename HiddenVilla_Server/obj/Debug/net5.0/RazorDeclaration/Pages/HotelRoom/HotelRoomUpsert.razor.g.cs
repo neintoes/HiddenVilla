@@ -104,6 +104,13 @@ using HiddenVilla_Server.Helper;
 #line hidden
 #nullable disable
 #nullable restore
+#line 14 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\_Imports.razor"
+using Blazored.TextEditor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
 #line 3 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
 using Models;
 
@@ -148,7 +155,7 @@ using Service.IService;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 89 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+#line 126 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
        
     [Parameter]
     public int? HotelRoomId { get; set; }
@@ -158,21 +165,20 @@ using Service.IService;
     //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
     private HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
     private bool isImageUploadProcessStarted { get; set; } = false;
+    BlazoredTextEditor QuillHtml;
+    string quillHtmlContent;
 
+    //Fix to infinite loop.
+    string preExistingDetailsHtml{ get; set; }
 
     string preExistingHotelName;
     List<string> preExistingImageUrls = new List<string>();
     private List<string> imagesToBeDeleted = new List<string>();
 
-    //remove when done
-    private void boolpress()
-    {
-        isImageUploadProcessStarted = !isImageUploadProcessStarted;
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        if(HotelRoomId == null)
+        if (HotelRoomId == null)
         {
             //method is create
             title = "Create";
@@ -183,10 +189,12 @@ using Service.IService;
             title = "Edit";
             roomModel = await hotelRoomRepository.GetHotelRoom(HotelRoomId.Value);
             preExistingHotelName = roomModel.Name;
+            preExistingDetailsHtml = roomModel.Details;
+            //The code below ensures that images are not left in the RoomImages folder if the the hotel room is not created.
             roomModel.ImageUrls = new List<string>();
-            if(roomModel.Images != null)
+            if (roomModel.Images != null)
             {
-                foreach(HotelRoomImageDTO image in roomModel.Images)
+                foreach (HotelRoomImageDTO image in roomModel.Images)
                 {
                     roomModel.ImageUrls.Add(image.ImageUrl);
                     preExistingImageUrls.Add(image.ImageUrl);
@@ -194,6 +202,7 @@ using Service.IService;
             }
         }
     }
+
 
     private async Task HandleHotelRoomUpsert()
     {
@@ -215,7 +224,7 @@ using Service.IService;
             {
                 //Handling create form input
                 Console.WriteLine("Submitting form.");
-
+                roomModel.Details = await QuillHtml.GetHTML();
                 var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
                 await AddHotelRoomImage(createdRoom);
                 await SuccessPress("The newly created hotel room Id is: " + createdRoom.HotelRoomId);
@@ -224,6 +233,7 @@ using Service.IService;
             else
             {
                 //Handling update form input
+                roomModel.Details = await QuillHtml.GetHTML();
                 var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
                 if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any() || (imagesToBeDeleted != null && imagesToBeDeleted.Any()))
                 {
@@ -358,12 +368,33 @@ using Service.IService;
         {
             throw new Exception(ex.ToString());
         }
+    }
 
+    //Quill Methods
+    public async void GetHTML()
+    {
+        quillHtmlContent = await this.QuillHtml.GetHTML();
+        StateHasChanged();
+    }
+
+    public void SetHTML()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(roomModel.Details))
+            {
+                this.QuillHtml.LoadHTMLContent(roomModel.Details);
+                StateHasChanged();
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
     }
 
     private void CreateToIndexPhotoDeletion()
     {
-        if (title == "Create")
+        if (title == "Create" && roomModel.ImageUrls != null)
         {
             foreach(var imageUrl in roomModel.ImageUrls)
             {

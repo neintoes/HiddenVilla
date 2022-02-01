@@ -101,6 +101,13 @@ using HiddenVilla_Server.Helper;
 #line hidden
 #nullable disable
 #nullable restore
+#line 14 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\_Imports.razor"
+using Blazored.TextEditor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
 #line 2 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
 using DataAccess.Data;
 

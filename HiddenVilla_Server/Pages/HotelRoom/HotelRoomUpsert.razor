@@ -36,14 +36,51 @@ NOT an actual reference to he HotelRoomRespository class.*@
                             <ValidationMessage For="()=>roomModel.RegularRate"/>
                         </div>
                         <div class="form-group">
-                            <label>Room Description:</label>
-                            <InputTextArea @bind-Value="roomModel.Details"></InputTextArea>
-                        </div>
-                        <div class="form-group">
                             <label>Square footage:</label>
                             <InputText @bind-Value="roomModel.SqFt"></InputText>
                         </div>
-                        <div class="form-group">
+
+@*                        <div class="form-group">
+                            <label>Room Description:</label>
+                            <InputTextArea @bind-Value="roomModel.Details"></InputTextArea>
+                        </div>*@
+
+                        <div class="form-group" style="height:250px;">
+                            <label>Details></label>
+                        <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Please enter room details">
+                            <ToolbarContent>
+                                <select class="ql-header">
+                                    <option selected=""></option>
+                                    <option value="1"></option>
+                                    <option value="2"></option>
+                                    <option value="3"></option>
+                                    <option value="4"></option>
+                                    <option value="5"></option>
+                                </select>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-color"></select>
+                                    <select class="ql-background"></select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                </span>
+                            </ToolbarContent>
+                            <EditorContent>
+                                @((MarkupString)@preExistingDetailsHtml)
+                            </EditorContent>
+                        </BlazoredTextEditor>
+                        </div>
+                        <div class="form-group" style="padding-top:70px;">
                             <InputFile OnChange="HandleImageUpload" multiple></InputFile>
                             <div class="row">
                                 @if (isImageUploadProcessStarted)
@@ -95,21 +132,20 @@ NOT an actual reference to he HotelRoomRespository class.*@
     //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
     private HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
     private bool isImageUploadProcessStarted { get; set; } = false;
+    BlazoredTextEditor QuillHtml;
+    string quillHtmlContent;
 
+    //Fix to infinite loop.
+    string preExistingDetailsHtml{ get; set; }
 
     string preExistingHotelName;
     List<string> preExistingImageUrls = new List<string>();
     private List<string> imagesToBeDeleted = new List<string>();
 
-    //remove when done
-    private void boolpress()
-    {
-        isImageUploadProcessStarted = !isImageUploadProcessStarted;
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        if(HotelRoomId == null)
+        if (HotelRoomId == null)
         {
             //method is create
             title = "Create";
@@ -120,10 +156,12 @@ NOT an actual reference to he HotelRoomRespository class.*@
             title = "Edit";
             roomModel = await hotelRoomRepository.GetHotelRoom(HotelRoomId.Value);
             preExistingHotelName = roomModel.Name;
+            preExistingDetailsHtml = roomModel.Details;
+            //The code below ensures that images are not left in the RoomImages folder if the the hotel room is not created.
             roomModel.ImageUrls = new List<string>();
-            if(roomModel.Images != null)
+            if (roomModel.Images != null)
             {
-                foreach(HotelRoomImageDTO image in roomModel.Images)
+                foreach (HotelRoomImageDTO image in roomModel.Images)
                 {
                     roomModel.ImageUrls.Add(image.ImageUrl);
                     preExistingImageUrls.Add(image.ImageUrl);
@@ -131,6 +169,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
             }
         }
     }
+
 
     private async Task HandleHotelRoomUpsert()
     {
@@ -152,7 +191,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
             {
                 //Handling create form input
                 Console.WriteLine("Submitting form.");
-
+                roomModel.Details = await QuillHtml.GetHTML();
                 var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
                 await AddHotelRoomImage(createdRoom);
                 await SuccessPress("The newly created hotel room Id is: " + createdRoom.HotelRoomId);
@@ -161,6 +200,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
             else
             {
                 //Handling update form input
+                roomModel.Details = await QuillHtml.GetHTML();
                 var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
                 if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any() || (imagesToBeDeleted != null && imagesToBeDeleted.Any()))
                 {
@@ -295,12 +335,33 @@ NOT an actual reference to he HotelRoomRespository class.*@
         {
             throw new Exception(ex.ToString());
         }
+    }
 
+    //Quill Methods
+    public async void GetHTML()
+    {
+        quillHtmlContent = await this.QuillHtml.GetHTML();
+        StateHasChanged();
+    }
+
+    public void SetHTML()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(roomModel.Details))
+            {
+                this.QuillHtml.LoadHTMLContent(roomModel.Details);
+                StateHasChanged();
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
     }
 
     private void CreateToIndexPhotoDeletion()
     {
-        if (title == "Create")
+        if (title == "Create" && roomModel.ImageUrls != null)
         {
             foreach(var imageUrl in roomModel.ImageUrls)
             {
