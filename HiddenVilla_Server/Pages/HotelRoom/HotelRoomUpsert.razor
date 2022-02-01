@@ -46,28 +46,39 @@ NOT an actual reference to he HotelRoomRespository class.*@
                         <div class="form-group">
                             <InputFile OnChange="HandleImageUpload" multiple></InputFile>
                             <div class="row">
-                                @if(roomModel.ImageUrls != null && roomModel.ImageUrls.Count >0)
+                                @if (isImageUploadProcessStarted)
                                 {
-                                    int serial = 1;
-                                    foreach(var roomImage in roomModel.ImageUrls)
-                                    {
-                                        <div class="col-md-2 mt-3">
-                                            <div class="room-image" style="background : url('@roomImage') 50% 50%; ">
-                                                <span class = "room-image-title">@serial</span>
-                                            </div>
-                                        
-                                            <button type="button" @onclick="()=>DeletePhoto(roomImage)" class="btn btn-outline-danger btn-block mt-4">
-                                                Delete
-                                            </button>
+                                    <div class="d-flex justify-content-center mt-4">
+                                        <div class="spinner-border text-info">
+
                                         </div>
-                                        serial++;
+                                    </div>
+                                }
+                                else
+                                { 
+                                    @if(roomModel.ImageUrls != null && roomModel.ImageUrls.Count >0)
+                                    {
+                                        int serial = 1;
+                                        foreach(var roomImage in roomModel.ImageUrls)
+                                        {
+                                            <div class="col-md-2 mt-3">
+                                                <div class="room-image" style="background : url('@roomImage') 50% 50%; ">
+                                                    <span class = "room-image-title">@serial</span>
+                                                </div>
+                                        
+                                                <button type="button" @onclick="()=>DeletePhoto(roomImage)" class="btn btn-outline-danger btn-block mt-4">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            serial++;
+                                        }
                                     }
                                 }
                             </div>
                         </div>
                         <div class="form-group">
                             <button class="btn btn-primary">@title Room</button>
-                            <NavLink href="hotel-room" class="btn btn-secondary">Back to Index</NavLink>
+                            <NavLink href="hotel-room" class="btn btn-secondary" @onclick="CreateToIndexPhotoDeletion">Back to Index</NavLink>
                         </div>
                     </EditForm>
                 </div>
@@ -83,10 +94,18 @@ NOT an actual reference to he HotelRoomRespository class.*@
     private HotelRoomDTO roomModel = new HotelRoomDTO();
     //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
     private HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
+    private bool isImageUploadProcessStarted { get; set; } = false;
+
 
     string preExistingHotelName;
     List<string> preExistingImageUrls = new List<string>();
     private List<string> imagesToBeDeleted = new List<string>();
+
+    //remove when done
+    private void boolpress()
+    {
+        isImageUploadProcessStarted = !isImageUploadProcessStarted;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,6 +187,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
+        isImageUploadProcessStarted = true;
         try
         {
             var images = new List<string>();
@@ -213,6 +233,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
             await ErrorPress(ex.ToString(), "failure");
             new Exception(ex.ToString());
         }
+        isImageUploadProcessStarted = false;
     }
 
     private async Task AddHotelRoomImage(HotelRoomDTO createdRoom)
@@ -275,6 +296,18 @@ NOT an actual reference to he HotelRoomRespository class.*@
             throw new Exception(ex.ToString());
         }
 
+    }
+
+    private void CreateToIndexPhotoDeletion()
+    {
+        if (title == "Create")
+        {
+            foreach(var imageUrl in roomModel.ImageUrls)
+            {
+                var imageName = imageUrl.Replace($"RoomImages/", "");
+                FileUpload.DeleteFile(imageName);
+            }
+        }
     }
 
     //JS button alerts.

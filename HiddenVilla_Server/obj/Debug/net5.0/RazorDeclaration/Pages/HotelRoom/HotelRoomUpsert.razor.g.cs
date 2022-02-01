@@ -148,7 +148,7 @@ using Service.IService;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 78 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
+#line 89 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomUpsert.razor"
        
     [Parameter]
     public int? HotelRoomId { get; set; }
@@ -157,10 +157,18 @@ using Service.IService;
     private HotelRoomDTO roomModel = new HotelRoomDTO();
     //Not going to instantiate a new copy of HotelRoomImage until the file upload method.
     private HotelRoomImageDTO imageDTO = new HotelRoomImageDTO();
+    private bool isImageUploadProcessStarted { get; set; } = false;
+
 
     string preExistingHotelName;
     List<string> preExistingImageUrls = new List<string>();
     private List<string> imagesToBeDeleted = new List<string>();
+
+    //remove when done
+    private void boolpress()
+    {
+        isImageUploadProcessStarted = !isImageUploadProcessStarted;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -242,6 +250,7 @@ using Service.IService;
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
+        isImageUploadProcessStarted = true;
         try
         {
             var images = new List<string>();
@@ -287,6 +296,7 @@ using Service.IService;
             await ErrorPress(ex.ToString(), "failure");
             new Exception(ex.ToString());
         }
+        isImageUploadProcessStarted = false;
     }
 
     private async Task AddHotelRoomImage(HotelRoomDTO createdRoom)
@@ -349,6 +359,18 @@ using Service.IService;
             throw new Exception(ex.ToString());
         }
 
+    }
+
+    private void CreateToIndexPhotoDeletion()
+    {
+        if (title == "Create")
+        {
+            foreach(var imageUrl in roomModel.ImageUrls)
+            {
+                var imageName = imageUrl.Replace($"RoomImages/", "");
+                FileUpload.DeleteFile(imageName);
+            }
+        }
     }
 
     //JS button alerts.

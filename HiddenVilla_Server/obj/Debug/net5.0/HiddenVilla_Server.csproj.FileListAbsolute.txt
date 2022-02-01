@@ -128,3 +128,5 @@ C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\bin\Debug\net5.0\Busi
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\bin\Debug\net5.0\Business.pdb
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\RazorDeclaration\Pages\LearnBlazorPages\BlazorJS.razor.g.cs
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Pages\LearnBlazorPages\BlazorJS.razor.g.cs
+C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\RazorDeclaration\Shared\DeleteConfirmation.razor.g.cs
+C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Shared\DeleteConfirmation.razor.g.cs

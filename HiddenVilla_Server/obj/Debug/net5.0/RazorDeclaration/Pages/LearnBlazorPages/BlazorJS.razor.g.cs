@@ -147,7 +147,7 @@ using Service.IService;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 20 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
+#line 19 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\LearnBlazorPages\BlazorJS.razor"
        
     ApplicationDbContext _db;
     string message = "Suck on deez";
@@ -181,6 +181,13 @@ using Service.IService;
     private async Task ErrorSwal(string messageOne, string messageTwo)
     {
         await JSRuntime.SwalError(messageOne, messageOne);
+    }
+
+    private async Task DropTables()
+    {
+        //As it stands I believe the call to drop the hotelRoomimage table only works if called before the call to drop the Hotel Room table.
+        await DropHotelRoomImageTable();
+        await DropHotelRoomTable();
     }
 
     private async Task DropHotelRoomTable()

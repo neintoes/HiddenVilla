@@ -105,20 +105,41 @@ using HiddenVilla_Server.Helper;
 #nullable disable
 #nullable restore
 #line 2 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
-using Models;
+using DataAccess.Data;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 3 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
-using Business.Repository;
+using HiddenVilla_Server.Service.IService;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 4 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
+using Microsoft.EntityFrameworkCore;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 5 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
+using Models;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 6 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
+using Business.Repository;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 7 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
 using Business.Repository.IRepoosiory;
 
 #line default
@@ -133,20 +154,54 @@ using Business.Repository.IRepoosiory;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 53 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
-           
+#line 63 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
+       
+    ApplicationDbContext _db;
     private IEnumerable<HotelRoomDTO> hotelRooms {get; set;}
+    private int? deleteRoomId { get; set; } = null;
+    public bool isProcessing { get; set; } = false;
 
     protected async override Task OnInitializedAsync()
     {
         hotelRooms = await HotelRoomRepository.GetAllHotelRoomsWithImages();
     }
 
+    private async Task HandleRoomDelete(int deletRoomIdInput)
+    {
+        deleteRoomId = deletRoomIdInput;
+        await JSRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    public async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        isProcessing = true;
+        if(isConfirmed && deleteRoomId != null)
+        {
+            IEnumerable<HotelRoomImageDTO> associatedImages = await HotelRoomImageRepository.GetImagesByHotelRoomId(deleteRoomId.Value);
+            //await _db.HotelRoomImage.Where(x => x.HotelRoomId == deleteRoomId.Value).ToListAsync();
+            foreach(var associatedImage in associatedImages)
+            {
+                var imageName = associatedImage.ImageUrl.Replace($"RoomImages/", "");
+                await HotelRoomImageRepository.DeleteImageById(associatedImage.HotelRoomId);
+                var result = FileUpload.DeleteFile(imageName);
+            }
+
+            await HotelRoomRepository.DeleteHotelRoom(deleteRoomId.Value);
+            await JSRuntime.ToastrSuccess("Hotel has been deleted from the database.");
+            hotelRooms = await HotelRoomRepository.GetAllHotelRooms();
+        }
+        await JSRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        isProcessing = false;
+    }
+
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager NavigationManager { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IFileUpload FileUpload { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomRepository HotelRoomRepository { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomImageRepository HotelRoomImageRepository { get; set; }
     }
 }
 #pragma warning restore 1591

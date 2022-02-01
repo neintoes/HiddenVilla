@@ -14,8 +14,7 @@
 <button class="btn btn-warning" @onclick="(()=>WarningPress(message))">Warning Button</button>
 <button class="btn btn-success" @onclick ="(()=>SuccessPress(message))">Success Button</button>
 @*CHANGE THE ONCLICK METHODS BELOW*@
-<button class="btn btn-danger" @onclick="DropHotelRoomImageTable">Secret: Delete all hotel room images</button>
-<button class="btn btn-danger" @onclick= "DropHotelRoomTable">Secret: Delete all hotel rooms</button>
+<button class="btn btn-danger" @onclick="DropTables">Secret: Drop tables</button>
 
 @code {
     ApplicationDbContext _db;
@@ -50,6 +49,13 @@
     private async Task ErrorSwal(string messageOne, string messageTwo)
     {
         await JSRuntime.SwalError(messageOne, messageOne);
+    }
+
+    private async Task DropTables()
+    {
+        //As it stands I believe the call to drop the hotelRoomimage table only works if called before the call to drop the Hotel Room table.
+        await DropHotelRoomImageTable();
+        await DropHotelRoomTable();
     }
 
     private async Task DropHotelRoomTable()
