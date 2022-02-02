@@ -110,7 +110,7 @@ using Blazored.TextEditor;
 #line default
 #line hidden
 #nullable disable
-    [Microsoft.AspNetCore.Components.RouteAttribute("/amenit")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/amenity-")]
     public partial class AmnityList : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998

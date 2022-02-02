@@ -16,5 +16,6 @@ namespace DataAccess.Data
 
         public DbSet<RoomModel> RoomModel { get; set; }
         public DbSet<HotelRoomImage> HotelRoomImage { get; set;}
+        public DbSet<HotelRoomAmenity> HotelRoomAmenity{ get; set; }
     }
 }
