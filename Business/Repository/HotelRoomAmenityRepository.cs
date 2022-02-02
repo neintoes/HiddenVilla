@@ -15,6 +15,12 @@ namespace Business.Repository.IRepoosiory
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
 
+        public HotelRoomAmenityRepository(ApplicationDbContext db, IMapper mapper)
+        {
+            _db = db;
+            _mapper = mapper;
+        }
+
         public async Task<HotelRoomAmenityDTO> CreateHotelRoomAmenity(HotelRoomAmenityDTO inputDTO)
         {
             HotelRoomAmenity newAmenity = _mapper.Map<HotelRoomAmenityDTO,HotelRoomAmenity>(inputDTO);

@@ -161,7 +161,7 @@ using Business.Repository.IRepoosiory;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 63 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
+#line 64 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor"
        
     ApplicationDbContext _db;
     private IEnumerable<HotelRoomDTO> hotelRooms {get; set;}

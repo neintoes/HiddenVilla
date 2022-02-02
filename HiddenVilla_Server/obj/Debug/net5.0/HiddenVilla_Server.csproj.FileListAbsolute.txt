@@ -132,6 +132,6 @@ C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razo
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Shared\DeleteConfirmation.razor.g.cs
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\bin\Debug\net5.0\Blazored.TextEditor.dll
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\RazorDeclaration\Pages\Amenity\AmenityUpsert.razor.g.cs
-C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\RazorDeclaration\Pages\Amenity\AmnityList.razor.g.cs
 C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Pages\Amenity\AmenityUpsert.razor.g.cs
-C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Pages\Amenity\AmnityList.razor.g.cs
+C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\RazorDeclaration\Pages\Amenity\AmenityList.razor.g.cs
+C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\obj\Debug\net5.0\Razor\Pages\Amenity\AmenityList.razor.g.cs

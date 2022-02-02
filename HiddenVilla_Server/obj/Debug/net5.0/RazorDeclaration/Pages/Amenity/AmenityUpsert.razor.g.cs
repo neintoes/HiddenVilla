@@ -110,8 +110,22 @@ using Blazored.TextEditor;
 #line default
 #line hidden
 #nullable disable
+#nullable restore
+#line 3 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\Amenity\AmenityUpsert.razor"
+using Business.Repository.IRepoosiory;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 4 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\Amenity\AmenityUpsert.razor"
+using Models;
+
+#line default
+#line hidden
+#nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/amenity/create")]
-    [Microsoft.AspNetCore.Components.RouteAttribute("/amenity/edit/{AmenityId:int}")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/amenity/edit/{HotelRoomAmenityId:int}")]
     public partial class AmenityUpsert : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -120,13 +134,118 @@ using Blazored.TextEditor;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 4 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\Amenity\AmenityUpsert.razor"
+#line 81 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Pages\Amenity\AmenityUpsert.razor"
        
-    //TODO - Create Amenity table and migrate it to the db.
+    [Parameter] 
+    public int? HotelRoomAmenityId{ get; set; }
+
+    private string title { get; set; }
+    //preExisting name for checking for name uniqueness (if the name has been changed fromt he pre existing name)
+    private string preExistingAmenityName { get; set; }
+    //preExisiting details for rendering into the quill text editor. (and avoiding that heinous infinite loop suggested in tutorial)
+    private string preExistingAmenityDescription{ get; set; }
+    HotelRoomAmenityDTO amenity { get; set; } = new HotelRoomAmenityDTO();
+
+    //Quill variables
+    BlazoredTextEditor QuillHtml;
+    string quillHtmlContent;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        if(HotelRoomAmenityId == null)
+        {
+            //CREATE page initialisation
+            title = "Create";
+            amenity = new HotelRoomAmenityDTO();
+        }
+        else
+        {
+            //EDIT page initialisation
+            title = "Edit";
+            amenity = await HotelRoomAmenityRepository.GetHotelRoomAmenity(HotelRoomAmenityId.Value);
+            preExistingAmenityName = amenity.Name;
+            preExistingAmenityDescription = amenity.Description;
+        }
+    }
+
+    private async Task HandleHotelAmenityUpsert()
+    {
+        try
+        {
+            if(amenity.Name != preExistingAmenityName || preExistingAmenityName == null)
+            {
+
+                var uniqueNameCheck = await HotelRoomAmenityRepository.IsHotelRoomAmenityUnique(amenity.Name);
+                if(uniqueNameCheck != null)
+                {
+                    //If the name of the amenity has been taken..
+                    await ErrorPress("Uh oh! There has been an error! This amenity name has already been taken.", "Please rename your amenity and try uploading it again.");
+                    return;
+                }
+
+                amenity.Description = await QuillHtml.GetHTML(); 
+                if(title == "Create")
+                {
+                    //Handle Create method
+                    var createdAmenity = await HotelRoomAmenityRepository.CreateHotelRoomAmenity(amenity);
+                    await SuccessPress(amenity.Name + " has successfully been entered into the system.");
+                }
+                else
+                {
+                    //Handle Update method
+                    var updatedAmenity = await HotelRoomAmenityRepository.UpdateHotelRoomAmenity(HotelRoomAmenityId.Value,amenity);
+                    await SuccessPress(amenity.Name + " has successfully been updated in the system.");
+                }
+                NavigationManager.NavigateTo("amenity");
+
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+
+    }
+
+    //QuillTextEditor Methods
+    public async void GetHTML()
+    {
+        quillHtmlContent = await this.QuillHtml.GetHTML();
+        StateHasChanged();
+    }
+
+    public void SetHTML()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(amenity.Description))
+            {
+                this.QuillHtml.LoadHTMLContent(amenity.Description);
+                StateHasChanged();
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
+    //JS button alerts
+    private async Task ErrorPress(string inputMessage, string inputMessageTwo)
+    {
+        await JSRuntime.SwalError(inputMessage, inputMessageTwo);
+    }
+
+        private async Task SuccessPress(string inputMessage)
+    {
+        await JSRuntime.ToastrSuccess(inputMessage);
+    }
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager NavigationManager { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IHotelRoomAmenityRepository HotelRoomAmenityRepository { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JSRuntime { get; set; }
     }
 }
 #pragma warning restore 1591

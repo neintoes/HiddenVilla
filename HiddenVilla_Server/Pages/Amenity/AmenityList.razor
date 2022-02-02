@@ -1,0 +1,107 @@
+﻿@page "/amenity"
+@using Business.Repository.IRepoosiory
+@using DataAccess.Data
+@using Models
+@inject IHotelRoomAmenityRepository HotelRoomAmenityRepository
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<div class="row mt-4">
+    <div class="col-8">
+        <h4 class="card-title text-info">All Amenities</h4>
+    </div>
+    <div class="col-3 offset-1">
+        <NavLink href="amenity/create" class="btn btn-info form-control">Add New Amenity</NavLink>
+    </div>
+</div>
+<div class="shadow-sm mt-3 ml-2">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Amenity Type</th>
+                <th scope="col">Timing</th>
+                <th scope="col">Icon</th>
+                <th scope="col">Description</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (amenities.Any())
+            {
+                @foreach (var amenity in amenities)
+                {
+                    <tr>
+                        @*Try to add a link to this row that will go directly to the hotel room when such pages are made*@
+                        <th scope="row">@amenity.Name</th>
+                        <td>@amenity.Timing</td>
+                        <td>@amenity.IconStyle</td>
+                        <td>@amenity.Description</td>
+                        <td><NavLink href=@($"/amenity/edit/{amenity.Id}") class="btn btn-primary">Edit Amenity</NavLink> </td>
+                        <td><button @onclick="()=>HandleAmenityDelete(amenity.Id)"class="btn btn-danger">Delete Amenity</button></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No records found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+   <DeleteConfirmation IsParentComponentProcessing="isProcessing" ConfirmationChanged="ConfirmDelete_Click"></DeleteConfirmation> 
+
+
+
+
+@code {
+    ApplicationDbContext _db;
+    private IEnumerable<HotelRoomAmenityDTO> amenities { get; set; }
+
+    //variables for handling amenity deletion
+    private bool isProcessing = false;
+    private int? deleteAmenityId{ get; set; } = null;
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            amenities = await HotelRoomAmenityRepository.GetAllHotelRoomAmenities();
+        }
+        catch(Exception ex)
+        {
+            await JSRuntime.SwalError(ex.ToString(), "Error message");
+        }
+    }
+
+    private async Task HandleAmenityDelete(int inputId)
+    {
+        deleteAmenityId = inputId;
+        await JSRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    private async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        try
+        {
+            isProcessing = true;
+            if(isConfirmed && deleteAmenityId != null)
+            {
+                await HotelRoomAmenityRepository.DeleteHotelRoomAmenity(deleteAmenityId.Value);
+                await JSRuntime.ToastrSuccess("Amenity has been removed from the database.");
+                amenities = await HotelRoomAmenityRepository.GetAllHotelRoomAmenities();
+                StateHasChanged();
+            }
+            isProcessing = false;
+            deleteAmenityId = null;
+            await JSRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+
+    }
+}

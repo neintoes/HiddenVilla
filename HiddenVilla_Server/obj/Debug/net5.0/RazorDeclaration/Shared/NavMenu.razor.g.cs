@@ -118,7 +118,7 @@ using Blazored.TextEditor;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 68 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Shared\NavMenu.razor"
+#line 73 "C:\Users\antho\source\repos\HiddenVilla\HiddenVilla_Server\Shared\NavMenu.razor"
        
     private bool collapseNavMenu = true;
 

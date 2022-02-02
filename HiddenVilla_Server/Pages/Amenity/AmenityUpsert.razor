@@ -1,6 +1,185 @@
 ﻿@page "/amenity/create"
-@page "/amenity/edit/{AmenityId:int}"
+@page "/amenity/edit/{HotelRoomAmenityId:int}"
+@using Business.Repository.IRepoosiory
+@using Models
+@inject IJSRuntime JSRuntime
+@inject IHotelRoomAmenityRepository HotelRoomAmenityRepository
+@inject NavigationManager NavigationManager
+
+ <div class="row mt-2 mb-5">
+        <h3 class="card-title text-info mb-3 ml-3">@title Hotel Room</h3>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <EditForm Model="@amenity" OnValidSubmit="HandleHotelAmenityUpsert">
+                        <DataAnnotationsValidator/>
+                        <div class="form-group">
+                            <label>Amenity Type:</label>
+                            <InputText @bind-Value="amenity.Name"></InputText>
+                            <ValidationMessage For="() =>amenity.Name"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Times Available:</label>
+                            <InputText @bind-Value="amenity.Timing"></InputText>
+                        </div>
+                        <div class="form-group">
+                            <label>Icon Styling:</label>
+                            <InputText @bind-Value="amenity.IconStyle"></InputText>
+                            <ValidationMessage For="()=>amenity.IconStyle"/>
+                        </div>
+
+@*                        <div class="form-group">
+                            <label>Room Description:</label>
+                            <InputTextArea @bind-Value="amenity.Details"></InputTextArea>
+                        </div>*@
+
+                        <div class="form-group" style="height:250px;">
+                            <label>Amenity Description</label>
+                        <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Please enter a description of the amenity">
+                            <ToolbarContent>
+                                <select class="ql-header">
+                                    <option selected=""></option>
+                                    <option value="1"></option>
+                                    <option value="2"></option>
+                                    <option value="3"></option>
+                                    <option value="4"></option>
+                                    <option value="5"></option>
+                                </select>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-color"></select>
+                                    <select class="ql-background"></select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                </span>
+                            </ToolbarContent>
+                            <EditorContent>
+                                @((MarkupString)@preExistingAmenityDescription)
+                            </EditorContent>
+                        </BlazoredTextEditor>
+                        </div>
+                        <div class="form-group" style="padding-top:70px;">
+                            <button class="btn btn-primary">@title Amenity</button>
+                            <NavLink href="amenity" class="btn btn-secondary">Back to Index</NavLink>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @code {
-    //TODO - Create Amenity table and migrate it to the db.
+    [Parameter] 
+    public int? HotelRoomAmenityId{ get; set; }
+
+    private string title { get; set; }
+    //preExisting name for checking for name uniqueness (if the name has been changed fromt he pre existing name)
+    private string preExistingAmenityName { get; set; }
+    //preExisiting details for rendering into the quill text editor. (and avoiding that heinous infinite loop suggested in tutorial)
+    private string preExistingAmenityDescription{ get; set; }
+    HotelRoomAmenityDTO amenity { get; set; } = new HotelRoomAmenityDTO();
+
+    //Quill variables
+    BlazoredTextEditor QuillHtml;
+    string quillHtmlContent;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        if(HotelRoomAmenityId == null)
+        {
+            //CREATE page initialisation
+            title = "Create";
+            amenity = new HotelRoomAmenityDTO();
+        }
+        else
+        {
+            //EDIT page initialisation
+            title = "Edit";
+            amenity = await HotelRoomAmenityRepository.GetHotelRoomAmenity(HotelRoomAmenityId.Value);
+            preExistingAmenityName = amenity.Name;
+            preExistingAmenityDescription = amenity.Description;
+        }
+    }
+
+    private async Task HandleHotelAmenityUpsert()
+    {
+        try
+        {
+            if(amenity.Name != preExistingAmenityName || preExistingAmenityName == null)
+            {
+
+                var uniqueNameCheck = await HotelRoomAmenityRepository.IsHotelRoomAmenityUnique(amenity.Name);
+                if(uniqueNameCheck != null)
+                {
+                    //If the name of the amenity has been taken..
+                    await ErrorPress("Uh oh! There has been an error! This amenity name has already been taken.", "Please rename your amenity and try uploading it again.");
+                    return;
+                }
+
+                amenity.Description = await QuillHtml.GetHTML(); 
+                if(title == "Create")
+                {
+                    //Handle Create method
+                    var createdAmenity = await HotelRoomAmenityRepository.CreateHotelRoomAmenity(amenity);
+                    await SuccessPress(amenity.Name + " has successfully been entered into the system.");
+                }
+                else
+                {
+                    //Handle Update method
+                    var updatedAmenity = await HotelRoomAmenityRepository.UpdateHotelRoomAmenity(HotelRoomAmenityId.Value,amenity);
+                    await SuccessPress(amenity.Name + " has successfully been updated in the system.");
+                }
+                NavigationManager.NavigateTo("amenity");
+
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+
+    }
+
+    //QuillTextEditor Methods
+    public async void GetHTML()
+    {
+        quillHtmlContent = await this.QuillHtml.GetHTML();
+        StateHasChanged();
+    }
+
+    public void SetHTML()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(amenity.Description))
+            {
+                this.QuillHtml.LoadHTMLContent(amenity.Description);
+                StateHasChanged();
+            }
+        } catch(Exception ex)
+        {
+            throw new Exception(ex.ToString());
+        }
+    }
+
+    //JS button alerts
+    private async Task ErrorPress(string inputMessage, string inputMessageTwo)
+    {
+        await JSRuntime.SwalError(inputMessage, inputMessageTwo);
+    }
+
+        private async Task SuccessPress(string inputMessage)
+    {
+        await JSRuntime.ToastrSuccess(inputMessage);
+    }
 }

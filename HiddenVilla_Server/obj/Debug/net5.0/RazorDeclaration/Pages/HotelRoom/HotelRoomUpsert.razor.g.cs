@@ -220,11 +220,13 @@ using Service.IService;
                 }
             }
 
+            //TODO- if HotelRoom upsert stops working then add the below line BACK into both the create and update form input.
+            //roomModel.Details = await QuillHtml.GetHTML();
+            roomModel.Details = await QuillHtml.GetHTML();
             if(HotelRoomId == null && title=="Create")
             {
                 //Handling create form input
                 Console.WriteLine("Submitting form.");
-                roomModel.Details = await QuillHtml.GetHTML();
                 var createdRoom = await hotelRoomRepository.CreateHotelRoom(roomModel);
                 await AddHotelRoomImage(createdRoom);
                 await SuccessPress("The newly created hotel room Id is: " + createdRoom.HotelRoomId);
@@ -233,7 +235,6 @@ using Service.IService;
             else
             {
                 //Handling update form input
-                roomModel.Details = await QuillHtml.GetHTML();
                 var updatedRoom = await hotelRoomRepository.UpdateHotelRoom(HotelRoomId.Value, roomModel);
                 if(roomModel.ImageUrls != null && roomModel.ImageUrls.Any() || (imagesToBeDeleted != null && imagesToBeDeleted.Any()))
                 {
