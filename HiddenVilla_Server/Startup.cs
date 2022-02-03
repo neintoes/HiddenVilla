@@ -47,6 +47,9 @@ namespace HiddenVilla_Server
             services.AddScoped<IHotelRoomAmenityRepository, HotelRoomAmenityRepository>();
             //Line below for configuring the FileUpload
             services.AddScoped<IFileUpload, FileUpload>();
+            //line below for accessing images (with more than just the physical path to the server(?)
+            //"allows us to access the request and access the url."
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

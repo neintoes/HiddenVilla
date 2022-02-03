@@ -240,7 +240,7 @@ using Service.IService;
                 {
                     foreach(var imageToBeDeletedUrl in imagesToBeDeleted)
                     {
-                        var imageName = imageToBeDeletedUrl.Replace($"RoomImages/", "");
+                        var imageName = imageToBeDeletedUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                         var result = FileUpload.DeleteFile(imageName);
                         await hotelRoomImageRepository.DeleteImageByImageUrl(imageToBeDeletedUrl);
                     }
@@ -350,7 +350,7 @@ using Service.IService;
         {
             //finding and deleting the selected image from the RoomImages folder.
             var imageIndex = roomModel.ImageUrls.FindIndex(x => x == imageUrl);
-            var imageName = imageUrl.Replace($"RoomImages/", "");
+            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}/", "");
 
             //Handling method when on the create form
             if(roomModel.HotelRoomId == 0 && title == "Create")
@@ -399,7 +399,7 @@ using Service.IService;
         {
             foreach(var imageUrl in roomModel.ImageUrls)
             {
-                var imageName = imageUrl.Replace($"RoomImages/", "");
+                var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                 FileUpload.DeleteFile(imageName);
             }
         }

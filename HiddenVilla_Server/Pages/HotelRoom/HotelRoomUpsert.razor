@@ -46,7 +46,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
                         </div>*@
 
                         <div class="form-group" style="height:250px;">
-                            <label>Details></label>
+                            <label>Details:</label>
                         <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Please enter room details">
                             <ToolbarContent>
                                 <select class="ql-header">
@@ -207,7 +207,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
                 {
                     foreach(var imageToBeDeletedUrl in imagesToBeDeleted)
                     {
-                        var imageName = imageToBeDeletedUrl.Replace($"RoomImages/", "");
+                        var imageName = imageToBeDeletedUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                         var result = FileUpload.DeleteFile(imageName);
                         await hotelRoomImageRepository.DeleteImageByImageUrl(imageToBeDeletedUrl);
                     }
@@ -317,7 +317,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
         {
             //finding and deleting the selected image from the RoomImages folder.
             var imageIndex = roomModel.ImageUrls.FindIndex(x => x == imageUrl);
-            var imageName = imageUrl.Replace($"RoomImages/", "");
+            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}/", "");
 
             //Handling method when on the create form
             if(roomModel.HotelRoomId == 0 && title == "Create")
@@ -366,7 +366,7 @@ NOT an actual reference to he HotelRoomRespository class.*@
         {
             foreach(var imageUrl in roomModel.ImageUrls)
             {
-                var imageName = imageUrl.Replace($"RoomImages/", "");
+                var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                 FileUpload.DeleteFile(imageName);
             }
         }

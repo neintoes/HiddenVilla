@@ -188,7 +188,7 @@ using Business.Repository.IRepoosiory;
             //await _db.HotelRoomImage.Where(x => x.HotelRoomId == deleteRoomId.Value).ToListAsync();
             foreach(var associatedImage in associatedImages)
             {
-                var imageName = associatedImage.ImageUrl.Replace($"RoomImages/", "");
+                var imageName = associatedImage.ImageUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                 await HotelRoomImageRepository.DeleteImageById(associatedImage.HotelRoomId);
                 var result = FileUpload.DeleteFile(imageName);
             }
