@@ -126,6 +126,8 @@ using Blazored.TextEditor;
     public EventCallback<bool> ConfirmationChanged { get; set; }
     [Parameter]
     public bool IsParentComponentProcessing { get; set; }
+    [Parameter]
+    public string objectName{ get; set; }
 
     protected override void OnParametersSet()
     {

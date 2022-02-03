@@ -148,6 +148,7 @@ using Models;
     //variables for handling amenity deletion
     private bool isProcessing = false;
     private int? deleteAmenityId{ get; set; } = null;
+    private string DeleteConfirmationObjectName = "";
 
     protected async override Task OnInitializedAsync()
     {
@@ -161,9 +162,10 @@ using Models;
         }
     }
 
-    private async Task HandleAmenityDelete(int inputId)
+    private async Task HandleAmenityDelete(int inputId, string inputName)
     {
         deleteAmenityId = inputId;
+        DeleteConfirmationObjectName = inputName;
         await JSRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
     }
 

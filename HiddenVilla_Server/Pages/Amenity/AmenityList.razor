@@ -35,10 +35,10 @@
                         @*Try to add a link to this row that will go directly to the hotel room when such pages are made*@
                         <th scope="row">@amenity.Name</th>
                         <td>@amenity.Timing</td>
-                        <td>@amenity.IconStyle</td>
-                        <td>@amenity.Description</td>
+                        <td><i class="@amenity.IconStyle"></i></td>
                         <td><NavLink href=@($"/amenity/edit/{amenity.Id}") class="btn btn-primary">Edit Amenity</NavLink> </td>
-                        <td><button @onclick="()=>HandleAmenityDelete(amenity.Id)"class="btn btn-danger">Delete Amenity</button></td>
+                        <td><button @onclick="()=>HandleAmenityDelete(amenity.Id, amenity.Name)"class="btn btn-danger">Delete Amenity</button></td>
+                        <td></td>
                     </tr>
                 }
             }
@@ -52,7 +52,7 @@
     </table>
 </div>
 
-   <DeleteConfirmation IsParentComponentProcessing="isProcessing" ConfirmationChanged="ConfirmDelete_Click"></DeleteConfirmation> 
+   <DeleteConfirmation objectName="@DeleteConfirmationObjectName" IsParentComponentProcessing="isProcessing" ConfirmationChanged="ConfirmDelete_Click"></DeleteConfirmation> 
 
 
 
@@ -64,6 +64,7 @@
     //variables for handling amenity deletion
     private bool isProcessing = false;
     private int? deleteAmenityId{ get; set; } = null;
+    private string DeleteConfirmationObjectName = "";
 
     protected async override Task OnInitializedAsync()
     {
@@ -77,9 +78,10 @@
         }
     }
 
-    private async Task HandleAmenityDelete(int inputId)
+    private async Task HandleAmenityDelete(int inputId, string inputName)
     {
         deleteAmenityId = inputId;
+        DeleteConfirmationObjectName = inputName;
         await JSRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
     }
 
